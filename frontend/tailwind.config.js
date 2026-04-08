@@ -21,6 +21,8 @@ export default {
         foreground: 'hsl(var(--foreground) / <alpha-value>)',
         card: 'hsl(var(--card) / <alpha-value>)',
         cardForeground: 'hsl(var(--card-foreground) / <alpha-value>)',
+        surface: 'hsl(var(--surface) / <alpha-value>)',
+        surfaceForeground: 'hsl(var(--surface-foreground) / <alpha-value>)',
         primary: 'hsl(var(--primary) / <alpha-value>)',
         primaryForeground: 'hsl(var(--primary-foreground) / <alpha-value>)',
         secondary: 'hsl(var(--secondary) / <alpha-value>)',
@@ -44,16 +46,16 @@ export default {
         '2xl': '1.5rem'
       },
       boxShadow: {
-        sm: '0 2px 8px -2px hsl(var(--shadow) / 0.12)',
-        md: '0 10px 28px -14px hsl(var(--shadow) / 0.22)',
-        lg: '0 18px 42px -20px hsl(var(--shadow) / 0.32)',
-        lift: '0 12px 28px -14px hsl(var(--shadow) / 0.25)'
+        sm: '0 1px 2px hsl(var(--shadow) / 0.06), 0 8px 24px -18px hsl(var(--shadow) / 0.22)',
+        md: '0 10px 30px -18px hsl(var(--shadow) / 0.28)',
+        lg: '0 18px 48px -20px hsl(var(--shadow) / 0.34)',
+        lift: '0 14px 32px -18px hsl(var(--shadow) / 0.3)'
       },
       fontSize: {
-        hero: ['clamp(2rem,4vw,3.25rem)', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'page-title': ['clamp(1.75rem,2.8vw,2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '650' }],
-        'section-title': ['1.25rem', { lineHeight: '1.35', letterSpacing: '-0.01em', fontWeight: '600' }],
-        body: ['1rem', { lineHeight: '1.65' }],
+        hero: ['clamp(2.1rem,4vw,3.35rem)', { lineHeight: '1.03', letterSpacing: '-0.025em', fontWeight: '700' }],
+        'page-title': ['clamp(1.8rem,2.8vw,2.65rem)', { lineHeight: '1.12', letterSpacing: '-0.018em', fontWeight: '650' }],
+        'section-title': ['1.25rem', { lineHeight: '1.32', letterSpacing: '-0.012em', fontWeight: '600' }],
+        body: ['1rem', { lineHeight: '1.72' }],
         small: ['0.875rem', { lineHeight: '1.5' }],
         label: ['0.8125rem', { lineHeight: '1.35', letterSpacing: '0.01em', fontWeight: '600' }]
       },
