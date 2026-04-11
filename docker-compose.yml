@@ -17,6 +17,7 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile.dev
     env_file:
       - ./backend/dev.env
     environment:
@@ -31,6 +32,7 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api/v1}
     depends_on:

@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"libro-backend/models/book"
+	"libro-backend/models/bookNote"
 	"libro-backend/repositories"
 	"libro-backend/statics/constants"
 	"libro-backend/statics/customErr"
@@ -34,8 +35,8 @@ type Analytics struct {
 
 func New(repo repositories.BookRepository) *Service { return &Service{repo: repo} }
 
-func (s *Service) List(ctx context.Context, userID uuid.UUID, search, status string) ([]book.Book, error) {
-	return s.repo.List(ctx, userID, repositories.BookFilter{Search: search, Status: status})
+func (s *Service) List(ctx context.Context, userID uuid.UUID, filter repositories.BookFilter) ([]book.Book, int64, error) {
+	return s.repo.List(ctx, userID, filter)
 }
 func (s *Service) Create(ctx context.Context, b *book.Book) error {
 	if b.Title == "" || b.Author == "" || b.TotalPages <= 0 {
@@ -111,7 +112,7 @@ func (s *Service) Summary(ctx context.Context, userID uuid.UUID) (map[string]int
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	reading, err := s.repo.List(ctx, userID, repositories.BookFilter{Status: constants.BookStatusCurrentlyRead})
+	reading, _, err := s.repo.List(ctx, userID, repositories.BookFilter{Status: constants.BookStatusCurrentlyRead})
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -119,7 +120,7 @@ func (s *Service) Summary(ctx context.Context, userID uuid.UUID) (map[string]int
 }
 
 func (s *Service) Analytics(ctx context.Context, userID uuid.UUID) (*Analytics, error) {
-	books, err := s.repo.List(ctx, userID, repositories.BookFilter{})
+	books, _, err := s.repo.List(ctx, userID, repositories.BookFilter{})
 	if err != nil {
 		return nil, err
 	}
@@ -208,12 +209,30 @@ func (s *Service) Analytics(ctx context.Context, userID uuid.UUID) (*Analytics, 
 	}, nil
 }
 
+func (s *Service) ListNotes(ctx context.Context, userID, bookID uuid.UUID) ([]bookNote.BookNote, error) {
+	if _, err := s.repo.GetByID(ctx, userID, bookID); err != nil {
+		return nil, err
+	}
+	return s.repo.ListNotes(ctx, userID, bookID)
+}
+
+func (s *Service) CreateNote(ctx context.Context, userID, bookID uuid.UUID, note string, highlight *string) (*bookNote.BookNote, error) {
+	if note == "" {
+		return nil, customErr.ErrBadRequest
+	}
+	if _, err := s.repo.GetByID(ctx, userID, bookID); err != nil {
+		return nil, err
+	}
+	n := &bookNote.BookNote{UserID: userID, BookID: bookID, Note: note, Highlight: highlight}
+	return n, s.repo.CreateNote(ctx, n)
+}
+
 func (s *Service) Insights(ctx context.Context, userID uuid.UUID) ([]map[string]string, error) {
 	analytics, err := s.Analytics(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	books, err := s.repo.List(ctx, userID, repositories.BookFilter{})
+	books, _, err := s.repo.List(ctx, userID, repositories.BookFilter{})
 	if err != nil {
 		return nil, err
 	}

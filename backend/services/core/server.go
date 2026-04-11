@@ -1,9 +1,12 @@
 package core
 
 import (
+	"fmt"
+	"log/slog"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"libro-backend/controllers/authController"
 	"libro-backend/controllers/bookController"
 	"libro-backend/controllers/mainController"
@@ -11,13 +14,36 @@ import (
 	"libro-backend/controllers/userController"
 	"libro-backend/controllers/wishlistController"
 	"libro-backend/middleware/auth"
+	"libro-backend/middleware/requestctx"
 	"libro-backend/statics/configs"
 )
 
-func NewServer(cfg *configs.Config, deps mainController.ControllerDeps) *fiber.App {
-	app := fiber.New()
-	app.Use(logger.New())
-	app.Use(cors.New(cors.Config{AllowOrigins: cfg.FrontendURL, AllowHeaders: "Origin, Content-Type, Accept, Authorization"}))
+func NewServer(cfg *configs.Config, deps mainController.ControllerDeps, logger *slog.Logger) *fiber.App {
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			status := fiber.StatusInternalServerError
+			message := "unexpected server error"
+			if fiberErr, ok := err.(*fiber.Error); ok {
+				status = fiberErr.Code
+				message = fiberErr.Message
+			}
+			logger.Error("request_failed",
+				slog.String("requestId", c.GetRespHeader("X-Request-ID")),
+				slog.String("method", c.Method()),
+				slog.String("path", c.Path()),
+				slog.Int("status", status),
+				slog.String("error", err.Error()),
+			)
+			return c.Status(status).JSON(fiber.Map{
+				"code":    "request_failed",
+				"message": message,
+				"details": fmt.Sprintf("request_id=%s", c.GetRespHeader("X-Request-ID")),
+			})
+		},
+	})
+	app.Use(requestid.New())
+	app.Use(requestctx.RequestLogger(logger))
+	app.Use(cors.New(cors.Config{AllowOrigins: cfg.FrontendURL, AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-Request-ID"}))
 
 	mainCtrl := mainController.NewMainController(deps.Main)
 	authCtrl := authController.NewAuthController(deps.Auth)
@@ -27,6 +53,7 @@ func NewServer(cfg *configs.Config, deps mainController.ControllerDeps) *fiber.A
 	userCtrl := userController.NewUserController(deps.User)
 
 	app.Get("/health", mainCtrl.Health)
+	app.Get("/ready", mainCtrl.Ready)
 
 	api := app.Group("/api/v1")
 	authRoutes := api.Group("/auth")
@@ -47,6 +74,12 @@ func NewServer(cfg *configs.Config, deps mainController.ControllerDeps) *fiber.A
 	protected.Delete("/books/:id", bookCtrl.Delete)
 	protected.Patch("/books/:id/status", bookCtrl.UpdateStatus)
 	protected.Patch("/books/:id/progress", readCtrl.UpdateProgress)
+	protected.Get("/books/:id/notes", bookCtrl.ListNotes)
+	protected.Post("/books/:id/notes", bookCtrl.AddNote)
+	protected.Get("/reading/sessions", readCtrl.ListSessions)
+	protected.Post("/reading/sessions", readCtrl.AddSession)
+	protected.Get("/reading/goals", readCtrl.Goals)
+	protected.Put("/reading/goals", readCtrl.UpsertGoal)
 	protected.Get("/wishlist", wishCtrl.List)
 	protected.Post("/wishlist", wishCtrl.Create)
 	protected.Get("/wishlist/:id", wishCtrl.Get)

@@ -69,8 +69,10 @@ func (f *fakeAuthRepo) DeleteRefreshToken(_ context.Context, tokenID string) err
 	return nil
 }
 
-func (f *fakeAuthRepo) CheckRateLimit(_ context.Context, _ string, _ int64, _ int64) (bool, error) {
-	return true, nil
+func (f *fakeAuthRepo) DeleteRefreshTokensByUser(_ context.Context, _ string) error { return nil }
+
+func (f *fakeAuthRepo) CheckRateLimit(_ context.Context, _ string, _ int64, _ int64) (bool, int64, error) {
+	return true, 2, nil
 }
 
 func newAuthServiceForTest(users *fakeUserRepo, auth *fakeAuthRepo) *Service {
@@ -92,7 +94,7 @@ func TestRegisterLoginAndRefresh(t *testing.T) {
 		t.Fatalf("expected normalized email, got %s", created.Email)
 	}
 
-	loggedInUser, pair, err := svc.Login(context.Background(), "127.0.0.1", "ada@example.com", "123456")
+	loggedInUser, pair, _, err := svc.Login(context.Background(), "127.0.0.1", "ada@example.com", "123456")
 	if err != nil {
 		t.Fatalf("login failed: %v", err)
 	}
@@ -119,5 +121,47 @@ func TestRegisterRejectsInvalidInput(t *testing.T) {
 	_, err := svc.Register(context.Background(), "", "", "123")
 	if !errors.Is(err, customErr.ErrBadRequest) {
 		t.Fatalf("expected bad request error, got %v", err)
+	}
+}
+
+func TestRegisterDuplicateEmailReturnsConflict(t *testing.T) {
+	t.Parallel()
+
+	users := &fakeUserRepo{
+		byEmail: map[string]*user.User{
+			"ada@example.com": {
+				ID:           uuid.New(),
+				Name:         "Ada",
+				Email:        "ada@example.com",
+				PasswordHash: "hashed",
+			},
+		},
+	}
+	svc := newAuthServiceForTest(users, &fakeAuthRepo{})
+	_, err := svc.Register(context.Background(), "Ada", "ada@example.com", "12345678")
+	if !errors.Is(err, customErr.ErrEmailAlreadyExists) {
+		t.Fatalf("expected email exists error, got %v", err)
+	}
+}
+
+func TestLoginInvalidCredentials(t *testing.T) {
+	t.Parallel()
+
+	users := &fakeUserRepo{byEmail: map[string]*user.User{}}
+	auth := &fakeAuthRepo{}
+	svc := newAuthServiceForTest(users, auth)
+	_, _, _, err := svc.Login(context.Background(), "127.0.0.1", "missing@example.com", "bad-pass")
+	if !errors.Is(err, customErr.ErrInvalidCredentials) {
+		t.Fatalf("expected invalid credentials error, got %v", err)
+	}
+}
+
+func TestRefreshInvalidToken(t *testing.T) {
+	t.Parallel()
+
+	svc := newAuthServiceForTest(&fakeUserRepo{byEmail: map[string]*user.User{}}, &fakeAuthRepo{})
+	_, err := svc.Refresh(context.Background(), "not-a-jwt")
+	if !errors.Is(err, customErr.ErrInvalidRefreshToken) {
+		t.Fatalf("expected invalid refresh token error, got %v", err)
 	}
 }
