@@ -21,9 +21,21 @@ export function parseApiError(error: unknown): ApiErrorPayload {
   const axiosError = error as AxiosError | undefined
   const data = axiosError?.response?.data as ApiErrorPayload | undefined
   const status = axiosError?.response?.status
-  if (!data && !status) return fallback
-  if (!data) {
+  const isAxiosLikeError = Boolean(axiosError && (axiosError.isAxiosError || axiosError.response || axiosError.request))
+
+  if (isAxiosLikeError && !axiosError?.response) {
     return { code: 'network_error', message: 'Unable to reach server. Please check your connection.' }
+  }
+
+  if (!data) {
+    if (status) {
+      return {
+        code: 'http_error',
+        message: `Request failed with status ${status}.`,
+        details: null
+      }
+    }
+    return fallback
   }
   return {
     code: data.code ?? 'unknown_error',
