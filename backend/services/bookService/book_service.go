@@ -111,7 +111,7 @@ func (s *Service) Summary(ctx context.Context, userID uuid.UUID) (map[string]int
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	reading, _, err := s.repo.List(ctx, userID, repositories.BookFilter{Status: constants.BookStatusCurrentlyRead, PageFilter: repositories.PageFilter{Page: 1, Limit: 50}})
+	reading, _, err := s.repo.List(ctx, userID, repositories.BookFilter{Status: constants.BookStatusCurrentlyRead})
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -119,7 +119,7 @@ func (s *Service) Summary(ctx context.Context, userID uuid.UUID) (map[string]int
 }
 
 func (s *Service) Analytics(ctx context.Context, userID uuid.UUID) (*Analytics, error) {
-	books, _, err := s.repo.List(ctx, userID, repositories.BookFilter{PageFilter: repositories.PageFilter{Page: 1, Limit: 500}})
+	books, _, err := s.repo.List(ctx, userID, repositories.BookFilter{})
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (s *Service) Insights(ctx context.Context, userID uuid.UUID) ([]map[string]
 	if err != nil {
 		return nil, err
 	}
-	books, _, err := s.repo.List(ctx, userID, repositories.BookFilter{PageFilter: repositories.PageFilter{Page: 1, Limit: 500}})
+	books, _, err := s.repo.List(ctx, userID, repositories.BookFilter{})
 	if err != nil {
 		return nil, err
 	}

@@ -31,8 +31,12 @@ func (r *wishlistRepo) List(ctx context.Context, userID uuid.UUID, filter Wishli
 	if filter.Order != "" {
 		order = filter.Order
 	}
+	query := q.Preload("PurchaseLinks").Order(fmt.Sprintf("%s %s", orderBy, order))
+	if filter.Limit > 0 {
+		query = query.Offset((filter.Page - 1) * filter.Limit).Limit(filter.Limit)
+	}
 	var items []wishlist.Wishlist
-	err := q.Preload("PurchaseLinks").Order(fmt.Sprintf("%s %s", orderBy, order)).Offset((filter.Page - 1) * filter.Limit).Limit(filter.Limit).Find(&items).Error
+	err := query.Find(&items).Error
 	return items, total, err
 }
 func (r *wishlistRepo) Create(ctx context.Context, w *wishlist.Wishlist) error {

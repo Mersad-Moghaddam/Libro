@@ -46,15 +46,23 @@ func main() {
 	ir := repositories.NewInitialRepositories(deps)
 	server := core.NewServer(cfg, mainController.DepsFromInitialRepositories(ir), logger)
 
+	listenErrCh := make(chan error, 1)
 	go func() {
-		if err = server.Listen(":" + cfg.AppPort); err != nil {
-			log.Printf("server stopped: %v", err)
-		}
+		listenErrCh <- server.Listen(":" + cfg.AppPort)
 	}()
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-	<-sigCh
+
+	select {
+	case sig := <-sigCh:
+		log.Printf("received signal %s", sig)
+	case listenErr := <-listenErrCh:
+		if listenErr != nil {
+			log.Fatal(listenErr)
+		}
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

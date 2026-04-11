@@ -35,8 +35,12 @@ func (r *bookRepo) List(ctx context.Context, userID uuid.UUID, filter BookFilter
 	if filter.Order != "" {
 		order = filter.Order
 	}
+	query := q.Order(fmt.Sprintf("%s %s", orderBy, order))
+	if filter.Limit > 0 {
+		query = query.Offset((filter.Page - 1) * filter.Limit).Limit(filter.Limit)
+	}
 	var books []book.Book
-	err := q.Order(fmt.Sprintf("%s %s", orderBy, order)).Offset((filter.Page - 1) * filter.Limit).Limit(filter.Limit).Find(&books).Error
+	err := query.Find(&books).Error
 	return books, total, err
 }
 func (r *bookRepo) Create(ctx context.Context, b *book.Book) error {
