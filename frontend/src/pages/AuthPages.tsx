@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, BookOpenText, Quote, Sparkles } from 'lucide-react'
-import { useForm } from 'react-hook-form'
 import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 
 import { parseApiError } from '../api/http'
