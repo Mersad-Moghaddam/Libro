@@ -55,6 +55,7 @@ type GoalSuggestion struct {
 	TargetPages *int    `json:"targetPages,omitempty"`
 	TargetBooks *int    `json:"targetBooks,omitempty"`
 	Reason      string  `json:"reason"`
+	ReasonKey   string  `json:"reasonKey"`
 	Confidence  string  `json:"confidence"`
 	Signals     Signals `json:"signals"`
 }
@@ -293,10 +294,12 @@ func (s *Service) buildSuggestions(ctx context.Context, userID uuid.UUID, sessio
 	weeklyBooks, monthlyBooks := recommendBookTargets(signals)
 	result := []GoalSuggestion{}
 	if weeklyPages != nil || weeklyBooks != nil {
-		result = append(result, GoalSuggestion{Period: "weekly", TargetPages: weeklyPages, TargetBooks: weeklyBooks, Reason: suggestionReason(signals.ActiveWeeks, signals.WeeklySessions), Confidence: suggestionConfidence(signals.ActiveWeeks), Signals: signals})
+		reasonKey, reason := suggestionReason(signals.ActiveWeeks, signals.WeeklySessions)
+		result = append(result, GoalSuggestion{Period: "weekly", TargetPages: weeklyPages, TargetBooks: weeklyBooks, Reason: reason, ReasonKey: reasonKey, Confidence: suggestionConfidence(signals.ActiveWeeks), Signals: signals})
 	}
 	if monthlyPages != nil || monthlyBooks != nil {
-		result = append(result, GoalSuggestion{Period: "monthly", TargetPages: monthlyPages, TargetBooks: monthlyBooks, Reason: suggestionReason(signals.ActiveWeeks, signals.WeeklySessions), Confidence: suggestionConfidence(signals.ActiveWeeks), Signals: signals})
+		reasonKey, reason := suggestionReason(signals.ActiveWeeks, signals.WeeklySessions)
+		result = append(result, GoalSuggestion{Period: "monthly", TargetPages: monthlyPages, TargetBooks: monthlyBooks, Reason: reason, ReasonKey: reasonKey, Confidence: suggestionConfidence(signals.ActiveWeeks), Signals: signals})
 	}
 	return result
 }
@@ -400,14 +403,14 @@ func recommendBookTargets(s Signals) (*int, *int) {
 	return &weekly, &monthly
 }
 
-func suggestionReason(activeWeeks, sessions int) string {
+func suggestionReason(activeWeeks, sessions int) (string, string) {
 	if activeWeeks <= 2 {
-		return "Based on your recent restart pace, we kept this realistic."
+		return "restart_pace", "Based on your recent restart pace, we kept this realistic."
 	}
 	if sessions >= 3 {
-		return "Based on your recent consistency, this is a gentle stretch target."
+		return "consistency_stretch", "Based on your recent consistency, this is a gentle stretch target."
 	}
-	return "Based on your recent reading pace over the last few weeks."
+	return "recent_pace", "Based on your recent reading pace over the last few weeks."
 }
 
 func suggestionConfidence(activeWeeks int) string {

@@ -66,6 +66,7 @@ export type GoalSuggestion = {
   targetPages?: number
   targetBooks?: number
   reason: string
+  reasonKey?: 'restart_pace' | 'consistency_stretch' | 'recent_pace'
   confidence: 'low' | 'medium' | 'high'
   signals: {
     recentWeeklyPagesMedian: number

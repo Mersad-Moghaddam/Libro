@@ -32,7 +32,7 @@ const goals = {
     exceeded: false
   },
   suggestions: [
-    { period: 'weekly' as const, targetPages: 120, targetBooks: 1, reason: 'Based on your recent pace.', confidence: 'high' as const, signals: { recentWeeklyPagesMedian: 110, recentMonthlyPagesMedian: 430, weeklySessions: 3, activeWeeks: 5, completedBooks30d: 1 } }
+    { period: 'weekly' as const, targetPages: 120, targetBooks: 1, reason: 'Based on your recent pace.', reasonKey: 'restart_pace' as const, confidence: 'high' as const, signals: { recentWeeklyPagesMedian: 110, recentMonthlyPagesMedian: 430, weeklySessions: 3, activeWeeks: 5, completedBooks30d: 1 } }
   ]
 }
 
@@ -46,6 +46,27 @@ describe('ReadingGoalsCard', () => {
     )
 
     expect(screen.getByText('پیشنهاد برای شما')).toBeInTheDocument()
+    expect(screen.getByText('با توجه به بازگشت اخیرت به مطالعه، این پیشنهاد را واقع‌بینانه تنظیم کردیم.')).toBeInTheDocument()
+    expect(screen.queryByText('Based on your recent restart pace, we kept this realistic.')).not.toBeInTheDocument()
+  })
+
+
+
+  it('uses localized fallback reason when reasonKey is missing', () => {
+    localStorage.setItem('libro.locale', 'fa')
+    const noKeyGoals = {
+      ...goals,
+      suggestions: [{ ...goals.suggestions[0], reasonKey: undefined }]
+    }
+
+    render(
+      <I18nProvider>
+        <ReadingGoalsCard goals={noKeyGoals} isSaving={false} onSave={async () => {}} />
+      </I18nProvider>
+    )
+
+    expect(screen.getByText('این پیشنهاد بر اساس فعالیت اخیرت ارائه شده است.')).toBeInTheDocument()
+    expect(screen.queryByText('Based on your recent pace.')).not.toBeInTheDocument()
   })
 
   it('applies suggestion into editable form', async () => {
