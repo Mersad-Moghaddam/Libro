@@ -234,15 +234,17 @@ Workflows in `.github/workflows/`:
 
 ## 20) Screenshots
 
-Real screenshots from the running app's landing page in both supported locales.
-
 ### Home page (English)
 
-<img src="docs/screenshots/home-en.svg" alt="Libro home page in English" width="1100" />
+![Libro home page in English](docs/screenshots/home-en.svg)
 
-### Home page (Persian)
+### Dashboard (English · Light mode)
 
-<img src="docs/screenshots/home-fa.svg" alt="Libro home page in Persian (RTL)" width="1100" />
+![Libro dashboard in English (light mode)](docs/screenshots/dashboard-en-light.svg)
+
+### Dashboard (English · Dark mode)
+
+![Libro dashboard in English (dark mode)](docs/screenshots/dashboard-en-dark.svg)
 
 ## 21) Contribution guidance
 
