@@ -40,7 +40,8 @@ function isValidDate(value: string) {
 }
 
 function inLastDays(date: Date, days: number, now: Date) {
-  return daysBetween(date, now) <= days
+  const age = daysBetween(date, now)
+  return age >= 0 && age <= days
 }
 
 function sumPagesInRange(sessions: ReadingSession[], minDaysAgo: number, maxDaysAgo: number, now: Date) {
@@ -57,7 +58,7 @@ export function buildReadingInsight(input: InsightInput): ReadingInsightModel {
   const now = new Date()
   const sessions = [...input.sessions]
     .map((session) => ({ ...session, parsedDate: isValidDate(session.date) }))
-    .filter((session): session is ReadingSession & { parsedDate: Date } => Boolean(session.parsedDate))
+    .filter((session): session is ReadingSession & { parsedDate: Date } => Boolean(session.parsedDate) && session.parsedDate <= now)
     .sort((a, b) => b.parsedDate.getTime() - a.parsedDate.getTime())
 
   const hasAnyActivity = sessions.length > 0 || (input.analytics?.base.totalPagesRead ?? 0) > 0
@@ -67,8 +68,11 @@ export function buildReadingInsight(input: InsightInput): ReadingInsightModel {
     .sort((a, b) => b.progressPercentage - a.progressPercentage)[0]
 
   const recent7 = sessions.filter((session) => inLastDays(session.parsedDate, 6, now))
-  const recent14 = sessions.filter((session) => inLastDays(session.parsedDate, 13, now))
-  const previous14 = sessions.filter((session) => {
+  const previous7 = sessions.filter((session) => {
+    const age = daysBetween(session.parsedDate, now)
+    return age >= 7 && age <= 13
+  })
+  const olderHistory = sessions.filter((session) => {
     const age = daysBetween(session.parsedDate, now)
     return age >= 14 && age <= 27
   })
@@ -124,7 +128,7 @@ export function buildReadingInsight(input: InsightInput): ReadingInsightModel {
     })
   }
 
-  if (recent7.length > 0 && previous14.length === 0 && recent14.length > 0) {
+  if (recent7.length > 0 && previous7.length === 0 && olderHistory.length > 0) {
     candidates.push({
       variant: 'positive',
       priority: 84,

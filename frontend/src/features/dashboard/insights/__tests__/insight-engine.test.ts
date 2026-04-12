@@ -108,4 +108,26 @@ describe('buildReadingInsight', () => {
 
     expect(insight.titleKey).toBe('dashboard.insights.titles.nearCompletion')
   })
+
+  it('ignores future-dated sessions when calculating recent windows', () => {
+    const insight = buildReadingInsight({
+      books: [makeBook()],
+      analytics: makeAnalytics(),
+      goals: [],
+      sessions: [makeSession('2026-04-15T00:00:00.000Z', 40), makeSession('2026-03-20T00:00:00.000Z', 20)]
+    })
+
+    expect(insight.titleKey).toBe('dashboard.insights.titles.inactive')
+  })
+
+  it('does not mark new users as resumed without a real inactivity gap', () => {
+    const insight = buildReadingInsight({
+      books: [makeBook()],
+      analytics: makeAnalytics(),
+      goals: [],
+      sessions: [makeSession('2026-04-11T00:00:00.000Z', 20), makeSession('2026-04-09T00:00:00.000Z', 15)]
+    })
+
+    expect(insight.titleKey).not.toBe('dashboard.insights.titles.resumed')
+  })
 })
