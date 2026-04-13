@@ -78,6 +78,14 @@ func (s *Service) Update(ctx context.Context, b *book.Book) error {
 		b.CompletedAt = &now
 		cp := b.TotalPages
 		b.CurrentPage = &cp
+	} else {
+		b.CompletedAt = nil
+		if b.Status == constants.BookStatusInLibrary || b.Status == constants.BookStatusNextToRead {
+			b.CurrentPage = nil
+		} else if b.CurrentPage == nil {
+			cp := 0
+			b.CurrentPage = &cp
+		}
 	}
 	return s.repo.Update(ctx, b)
 }
