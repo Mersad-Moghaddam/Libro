@@ -532,7 +532,7 @@ export function BookDetails({ id }: { id: string }) {
         <div className="grid gap-4 md:grid-cols-[auto_1fr] md:items-center"><BookCover title={book.title} coverUrl={book.coverUrl} /><div className="space-y-2"><p>{t('books.readingProgress')}: {Math.round(book.progressPercentage)}%</p><Progress value={book.progressPercentage} /></div></div>
       </SectionCard>
       <SectionCard>
-        <SectionHeader title="Edit details" description="Update the book information saved in your library." />
+        <SectionHeader title={t('books.editDetailsTitle')} description={t('books.editDetailsDescription')} />
         <form
           className="grid gap-3 md:grid-cols-2"
           onSubmit={editForm.handleSubmit(async (values) => {
@@ -550,9 +550,9 @@ export function BookDetails({ id }: { id: string }) {
                 }
               })
               await updateProgress.mutateAsync({ id: book.id, currentPage: values.currentPage })
-              toast.success('Book details updated')
+              toast.success(t('books.bookUpdated'))
             } catch {
-              toast.error('Failed to update book details')
+              toast.error(t('books.updateError'))
             }
           })}
         >
