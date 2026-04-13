@@ -636,7 +636,6 @@ export function Profile() {
           <Button type="submit" className="md:col-span-3 md:w-fit" disabled={updateReminder.isPending}>{t('profile.saveReminders')}</Button>
         </form>
       </SectionCard>
-      <SectionCard className="max-w-3xl"><SectionHeader title={t('profile.notesTitle')} /><Textarea placeholder={t('profile.notesPlaceholder')} /></SectionCard>
     </div>
   )
 }
