@@ -167,7 +167,7 @@ function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
           <p className="truncate text-[11px] text-mutedForeground">{active ? t(active.labelKey) : t('nav.dashboard')}</p>
         </div>
       </Link>
-      <ThemeToggle />
+      <ThemeToggle compact />
       </div>
     </header>
   )
