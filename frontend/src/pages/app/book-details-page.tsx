@@ -212,7 +212,9 @@ export function BookDetails({ id }: { id: string }) {
             <div key={session.id} className="rounded-xl border border-border bg-surface p-3 text-sm">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-medium">{formatDate(session.date)}</p>
-                <p className="text-mutedForeground">{numberFormatter.format(session.pagesRead)} p</p>
+                <p className="text-mutedForeground">
+                  {numberFormatter.format(session.pagesRead)} {t('books.pagesShortLabel')}
+                </p>
               </div>
               <p className="mt-1 text-xs text-mutedForeground">
                 {numberFormatter.format(session.duration)} {t('books.minutesLabel')}
