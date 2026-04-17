@@ -264,22 +264,24 @@ export function BookDetails({ id }: { id: string }) {
         </form>
         <div className="mt-3 space-y-2">
           {notesQuery.data?.map((n) => (
-            <div key={n.id} className="rounded-xl border border-border bg-surface p-4 text-[0.95rem]">
-              <div className="mb-2 flex justify-end">
+            <div key={n.id} className="rounded-xl border border-border bg-surface p-3 text-sm">
+              <div className="flex items-start gap-2">
+                <div className="flex-1">
+                  <p>{n.note}</p>
+                  {n.highlight ? <p className="mt-1 text-mutedForeground">“{n.highlight}”</p> : null}
+                </div>
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-9 w-9 rounded-lg p-0 text-mutedForeground hover:text-destructive"
+                  className="h-8 w-8 rounded-md p-0 text-mutedForeground hover:text-destructive"
                   onClick={() => {
                     void deleteNote.mutateAsync(n.id)
                   }}
                   aria-label={t('books.delete')}
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="leading-7">{n.note}</p>
-              {n.highlight ? <p className="mt-2 text-mutedForeground">“{n.highlight}”</p> : null}
             </div>
           ))}
           {!notesQuery.data?.length ? (
