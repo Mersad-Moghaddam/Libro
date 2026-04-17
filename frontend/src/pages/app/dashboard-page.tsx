@@ -141,13 +141,13 @@ export function Dashboard() {
 
       <SectionCard>
         <SectionHeader
-          title={t('dashboard.coachHubTitle')}
-          description={t('dashboard.coachHubDesc')}
+          title={t('dashboard.libraryHubTitle')}
+          description={t('dashboard.libraryHubDesc')}
         />
         <div className="space-y-3 rounded-xl border border-border bg-surface p-4">
-          <p className="text-sm text-mutedForeground">{t('dashboard.coachHubBody')}</p>
-          <Link to="/coach">
-            <Button size="sm">{t('dashboard.openCoach')}</Button>
+          <p className="text-sm text-mutedForeground">{t('dashboard.libraryHubBody')}</p>
+          <Link to="/library">
+            <Button size="sm">{t('dashboard.openLibrary')}</Button>
           </Link>
         </div>
       </SectionCard>

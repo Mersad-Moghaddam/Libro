@@ -212,6 +212,11 @@ export const messages = {
       coachHubBody:
         'Open Reading Coach to review suggestions, study your reading stats, and adjust goals.',
       openCoach: 'Open reading coach',
+      libraryHubTitle: 'Library',
+      libraryHubDesc: 'Keep your reading queue clean and easy to continue from one place.',
+      libraryHubBody:
+        'Open your library to organize titles, update statuses, and quickly decide what to read next.',
+      openLibrary: 'Open library',
       goLibrary: 'Go to library',
       needsAttention: 'Needs attention',
       tidyTitle: 'Everything is tidy',
@@ -630,6 +635,11 @@ export const messages = {
       coachHubBody:
         'مربی مطالعه را باز کن تا پیشنهادها را ببینی، آمار را مرور کنی و هدف‌ها را تنظیم کنی.',
       openCoach: 'باز کردن مربی مطالعه',
+      libraryHubTitle: 'کتابخانه',
+      libraryHubDesc: 'فهرست مطالعه‌ات را مرتب و قابل‌ادامه در یک جای ساده نگه دار.',
+      libraryHubBody:
+        'کتابخانه را باز کن تا کتاب‌ها را مرتب کنی، وضعیت‌ها را تغییر بدهی و سریع تصمیم بگیری بعدی چیست.',
+      openLibrary: 'ورود به کتابخانه',
       goLibrary: 'برو به کتابخانه',
       needsAttention: 'نیازمند توجه',
       tidyTitle: 'همه‌چیز مرتب است',
