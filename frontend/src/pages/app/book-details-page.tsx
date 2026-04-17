@@ -161,7 +161,7 @@ export function BookDetails({ id }: { id: string }) {
                     }
                   }}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-5 w-5" />
                 </Button>
               </div>
               {n.highlight ? <p className="mt-1 text-mutedForeground">“{n.highlight}”</p> : null}
