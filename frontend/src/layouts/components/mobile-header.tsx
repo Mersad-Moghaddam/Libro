@@ -9,7 +9,7 @@ export function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
   const { t } = useI18n()
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-border/80 bg-card/95 px-3 py-[max(0.6rem,env(safe-area-inset-top))] shadow-sm backdrop-blur lg:hidden">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-border/80 bg-card/95 px-3 py-[var(--mobile-header-vpad)] shadow-sm backdrop-blur lg:hidden">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-2">
         <button
           type="button"
