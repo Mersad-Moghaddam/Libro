@@ -129,7 +129,23 @@ export function useUpdateBookStatusMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: BookStatus }) => updateBookStatus(id, status),
+    mutationFn: ({
+      id,
+      status,
+      finishRating,
+      finishReflection,
+      finishHighlight,
+      nextToReadFocus,
+      nextToReadNote
+    }: {
+      id: string
+      status?: BookStatus
+      finishRating?: number
+      finishReflection?: string
+      finishHighlight?: string
+      nextToReadFocus?: boolean
+      nextToReadNote?: string
+    }) => updateBookStatus(id, { status, finishRating, finishReflection, finishHighlight, nextToReadFocus, nextToReadNote }),
     onSuccess: (_data, variables) => {
       void invalidateReadingDerivedQueries(queryClient, variables.id)
     }

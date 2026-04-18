@@ -15,6 +15,11 @@ export type Book = {
   genre?: string | null
   isbn?: string | null
   completedAt: string | null
+  finishRating?: number | null
+  finishReflection?: string | null
+  finishHighlight?: string | null
+  nextToReadFocus?: boolean
+  nextToReadNote?: string | null
   createdAt: string
   updatedAt: string
 }
