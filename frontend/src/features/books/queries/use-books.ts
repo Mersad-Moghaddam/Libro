@@ -22,6 +22,7 @@ async function invalidateReadingDerivedQueries(queryClient: ReturnType<typeof us
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.analytics }),
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.goals }),
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.sessions }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.insights }),
     bookId ? queryClient.invalidateQueries({ queryKey: queryKeys.books.detail(bookId) }) : Promise.resolve()
   ])
 }
