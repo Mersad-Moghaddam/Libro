@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { authStore } from '../../../contexts/authStore'
 import { queryKeys } from '../../../shared/query/query-keys'
 import {
   fetchReminderSettings,
@@ -16,7 +17,16 @@ export function useReminderSettingsQuery() {
 }
 
 export function useUpdateProfileNameMutation() {
-  return useMutation({ mutationFn: updateProfileName })
+  const setUser = authStore((state) => state.setUser)
+
+  return useMutation({
+    mutationFn: updateProfileName,
+    onSuccess: (_data, name) => {
+      const currentUser = authStore.getState().user
+      if (!currentUser) return
+      setUser({ ...currentUser, name })
+    }
+  })
 }
 
 export function useUpdatePasswordMutation() {

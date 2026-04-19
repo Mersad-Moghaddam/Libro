@@ -5,9 +5,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
-	"libro-backend/middleware/requestctx"
-	"libro-backend/pkg/apiresponse"
-	"libro-backend/pkg/security"
+	"negar-backend/middleware/requestctx"
+	"negar-backend/pkg/apiresponse"
+	"negar-backend/pkg/security"
 )
 
 func AuthMiddleware(jwtSecret string, logger *zap.Logger) fiber.Handler {

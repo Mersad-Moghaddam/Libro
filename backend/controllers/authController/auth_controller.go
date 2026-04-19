@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
-	"libro-backend/apiSchema/authSchema"
-	"libro-backend/pkg/apiresponse"
-	"libro-backend/pkg/validation"
-	"libro-backend/services/apiErrCode"
-	"libro-backend/services/authService"
+	"negar-backend/apiSchema/authSchema"
+	"negar-backend/pkg/apiresponse"
+	"negar-backend/pkg/requestutil"
+	"negar-backend/pkg/validation"
+	"negar-backend/services/apiErrCode"
+	"negar-backend/services/authService"
 )
 
 type ServiceBridge struct {
@@ -35,7 +35,7 @@ func (h *AuthController) Register(c *fiber.Ctx) error {
 	req.Password = validation.Required(req.Password, "password", errs)
 	validation.StringLength(req.Name, "name", 2, 120, errs)
 	validation.StringLength(req.Email, "email", 5, 160, errs)
-	validation.StringLength(req.Password, "password", 8, 72, errs)
+	validation.StringLength(req.Password, "password", validation.MinPasswordLength, validation.MaxPasswordLength, errs)
 	validation.Email(req.Email, "email", errs)
 	if req.Password != req.ConfirmPassword {
 		errs.Add("confirmPassword", "must match password")
@@ -91,7 +91,10 @@ func (h *AuthController) Logout(c *fiber.Ctx) error {
 	return apiresponse.OK(c, fiber.Map{"message": "logged out"}, nil)
 }
 func (h *AuthController) Me(c *fiber.Ctx) error {
-	uid, _ := uuid.Parse(c.Locals("userID").(string))
+	uid, err := requestutil.UserID(c)
+	if err != nil {
+		return apiErrCode.RespondError(c, err)
+	}
 	u, err := h.service.User.Get(c.Context(), uid)
 	if err != nil {
 		return apiErrCode.RespondError(c, err)
