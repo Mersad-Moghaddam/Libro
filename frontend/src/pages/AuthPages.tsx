@@ -156,9 +156,10 @@ function AuthFrame({ title, subtitle, children }: { title: string; subtitle: str
 
 export function Register() {
   const nav = useNavigate()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const toast = useToast()
   const registerMutation = useRegisterMutation()
+  const isPersianMobileField = locale === 'fa'
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -191,7 +192,15 @@ export function Register() {
             <FieldError message={form.formState.errors.name?.message} />
           </div>
           <div>
-            <Input type="tel" inputMode="tel" placeholder={t('auth.mobile')} {...form.register('mobile')} />
+            <Input
+              type="tel"
+              inputMode="tel"
+              dir={isPersianMobileField ? 'ltr' : undefined}
+              textAlign={isPersianMobileField ? 'end' : undefined}
+              aria-label={t('auth.mobile')}
+              placeholder={t('auth.mobile')}
+              {...form.register('mobile')}
+            />
             <FieldError message={form.formState.errors.mobile?.message} />
           </div>
           <div>
@@ -219,9 +228,10 @@ export function Register() {
 
 export function Login() {
   const nav = useNavigate()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const toast = useToast()
   const loginMutation = useLoginMutation()
+  const isPersianMobileField = locale === 'fa'
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -249,7 +259,15 @@ export function Login() {
       <AuthFrame title={t('auth.welcomeBack')} subtitle={t('auth.loginSubtitle')}>
         <form onSubmit={onSubmit} className="space-y-3" noValidate aria-busy={loginMutation.isPending}>
           <div>
-            <Input type="tel" inputMode="tel" placeholder={t('auth.mobile')} {...form.register('mobile')} />
+            <Input
+              type="tel"
+              inputMode="tel"
+              dir={isPersianMobileField ? 'ltr' : undefined}
+              textAlign={isPersianMobileField ? 'end' : undefined}
+              aria-label={t('auth.mobile')}
+              placeholder={t('auth.mobile')}
+              {...form.register('mobile')}
+            />
             <FieldError message={form.formState.errors.mobile?.message} />
           </div>
           <div>
