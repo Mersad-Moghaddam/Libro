@@ -6,9 +6,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '../../shared/toast/toast-provider'
 import { Register } from '../AuthPages'
 
-const { postMock, registerMutateAsyncMock } = vi.hoisted(() => ({
+const { postMock, registerMutateAsyncMock, localeMock } = vi.hoisted(() => ({
   postMock: vi.fn(),
-  registerMutateAsyncMock: vi.fn()
+  registerMutateAsyncMock: vi.fn(),
+  localeMock: { current: 'en' as 'en' | 'fa' }
 }))
 
 vi.mock('../../api/client', () => ({
@@ -29,6 +30,7 @@ vi.mock('../../features/auth/queries/use-auth-mutations', () => ({
 
 vi.mock('../../shared/i18n/i18n-provider', () => ({
   useI18n: () => ({
+    locale: localeMock.current,
     t: (key: string) => key
   })
 }))
@@ -37,6 +39,7 @@ describe('Register page', () => {
   beforeEach(() => {
     postMock.mockReset()
     registerMutateAsyncMock.mockReset()
+    localeMock.current = 'en'
   })
 
   it('shows duplicate mobile message when backend returns conflict', async () => {
@@ -92,5 +95,20 @@ describe('Register page', () => {
         password: 'strong-pass'
       })
     })
+  })
+
+  it('binds registration mobile field to the mobile schema key and placeholder', () => {
+    render(
+      <ToastProvider>
+        <MemoryRouter>
+          <Register />
+        </MemoryRouter>
+      </ToastProvider>
+    )
+
+    const mobileInput = screen.getByLabelText('auth.mobile')
+
+    expect(mobileInput).toHaveAttribute('name', 'mobile')
+    expect(mobileInput).toHaveAttribute('placeholder', 'auth.mobile')
   })
 })

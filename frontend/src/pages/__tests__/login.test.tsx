@@ -7,10 +7,11 @@ import { authStore } from '../../contexts/authStore'
 import { ToastProvider } from '../../shared/toast/toast-provider'
 import { Login } from '../AuthPages'
 
-const { navigateMock, postMock, loginMutateAsyncMock } = vi.hoisted(() => ({
+const { navigateMock, postMock, loginMutateAsyncMock, localeMock } = vi.hoisted(() => ({
   navigateMock: vi.fn(),
   postMock: vi.fn(),
-  loginMutateAsyncMock: vi.fn()
+  loginMutateAsyncMock: vi.fn(),
+  localeMock: { current: 'en' as 'en' | 'fa' }
 }))
 
 vi.mock('../../api/client', () => ({
@@ -35,6 +36,7 @@ vi.mock('react-router-dom', async () => {
 
 vi.mock('../../shared/i18n/i18n-provider', () => ({
   useI18n: () => ({
+    locale: localeMock.current,
     t: (key: string) => key
   })
 }))
@@ -44,6 +46,7 @@ describe('Login page', () => {
     navigateMock.mockReset()
     postMock.mockReset()
     loginMutateAsyncMock.mockReset()
+    localeMock.current = 'en'
     localStorage.clear()
     authStore.setState({ user: null, accessToken: null, refreshToken: null, hydrated: false })
   })
@@ -105,5 +108,39 @@ describe('Login page', () => {
     await waitFor(() => {
       expect(screen.getByText('auth.invalidCredentials')).toBeInTheDocument()
     })
+  })
+
+  it('binds the login identifier to the mobile field', () => {
+    render(
+      <ToastProvider>
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      </ToastProvider>
+    )
+
+    const mobileInput = screen.getByLabelText('auth.mobile')
+
+    expect(mobileInput).toHaveAttribute('name', 'mobile')
+    expect(mobileInput).toHaveAttribute('placeholder', 'auth.mobile')
+    expect(screen.queryByPlaceholderText('auth.email')).not.toBeInTheDocument()
+  })
+
+  it('uses RTL-safe mobile alignment in Persian without changing the field binding', () => {
+    localeMock.current = 'fa'
+
+    render(
+      <ToastProvider>
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      </ToastProvider>
+    )
+
+    const mobileInput = screen.getByLabelText('auth.mobile')
+
+    expect(mobileInput).toHaveAttribute('name', 'mobile')
+    expect(mobileInput).toHaveAttribute('dir', 'ltr')
+    expect(mobileInput).toHaveClass('text-right')
   })
 })
